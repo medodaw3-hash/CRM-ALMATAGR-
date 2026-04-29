@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="root">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lumen CRM — معاينة ثنائية اللغة</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;550;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'IBM Plex Sans Arabic', 'system-ui', 'sans-serif'],
+          arabic: ['IBM Plex Sans Arabic', 'Inter', 'sans-serif'],
+          mono: ['JetBrains Mono', 'monospace'],
+        },
+        colors: {
+          ink: { 50:'#f7f8f9', 100:'#eef0f2', 200:'#dde0e5', 300:'#c2c7cf', 400:'#9ba1ac', 500:'#6b7280', 600:'#4b5159', 700:'#363a41', 800:'#22252b', 900:'#14161a', 950:'#0b0c0f' },
+          brand: { 50:'#eef4ff', 100:'#dce8ff', 500:'#3b6ef5', 600:'#2c57db', 700:'#1f43b3' },
+        },
+        boxShadow: {
+          'soft': '0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06)',
+          'card': '0 1px 2px rgba(16,24,40,0.04), 0 4px 12px rgba(16,24,40,0.04)',
+          'pop':  '0 8px 28px rgba(16,24,40,0.10), 0 2px 6px rgba(16,24,40,0.06)',
+        },
+      }
+    }
+  }
+</script>
+<style>
+  html, body { font-family: 'Inter', 'IBM Plex Sans Arabic', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  [dir="rtl"] body, [dir="rtl"] { font-family: 'IBM Plex Sans Arabic', 'Inter', system-ui, sans-serif; }
+  body { background: #fafbfc; color: #14161a; }
+  .scrollbar-thin::-webkit-scrollbar { width:6px; height:6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(0,0,0,.12); border-radius: 999px; }
+  .nav-link.active { background: rgba(255,255,255,0.10); color: #fff; }
+  .nav-link.active .nav-icon { color: #fff; }
+  .kanban-col { min-width: 320px; }
+  .lead-card { transition: transform .15s, box-shadow .15s, border-color .15s; }
+  .lead-card:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(16,24,40,0.08); }
+  .ring-focus:focus { outline: none; box-shadow: 0 0 0 3px rgba(59,110,245,.18); border-color: #3b6ef5; }
+  /* RTL flip for directional icons */
+  [dir="rtl"] [data-flip-rtl] { transform: scaleX(-1); }
+  /* Phone numbers stay LTR */
+  [dir="rtl"] .force-ltr, [dir="rtl"] [data-numeric] { direction: ltr; unicode-bidi: embed; display: inline-block; }
+  /* Pulse */
+  @keyframes pulse-soft { 0%,100%{opacity:1} 50%{opacity:.55} }
+  .pulse-dot { animation: pulse-soft 1.8s ease-in-out infinite; }
+  /* Page tabs */
+  .page { display: none; }
+  .page.active { display: block; }
+  /* Border-l accent flips in RTL */
+  [dir="rtl"] .border-l-2 { border-left-width: 0; border-right-width: 2px; }
+  [dir="rtl"] .border-l-rose-500 { border-right-color: #f43f5e; border-left-color: transparent; }
+  [dir="rtl"] .border-l-amber-500 { border-right-color: #f59e0b; border-left-color: transparent; }
+  /* Charts always LTR */
+  [dir="rtl"] .chart-ltr { direction: ltr; }
+  /* Lang switcher visual */
+  .lang-toggle { transition: all .2s; }
+  .lang-toggle.active { background: rgba(255,255,255,0.15); color: white; }
+  /* Sidebar border swap */
+  [dir="rtl"] aside.sidebar { border-left: 1px solid rgba(255,255,255,0.05); border-right: 0; }
+  [dir="ltr"] aside.sidebar { border-right: 1px solid rgba(255,255,255,0.05); border-left: 0; }
+  /* Numbers in arabic UI - keep latin for KPI clarity */
+  [dir="rtl"] .num { font-feature-settings: "tnum"; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<div class="flex min-h-screen">
+
+  <!-- ============= SIDEBAR ============= -->
+  <aside class="sidebar w-64 shrink-0 bg-ink-950 text-ink-300 flex flex-col fixed inset-y-0 start-0 z-30">
+    <!-- Brand -->
+    <div class="h-16 px-5 flex items-center gap-2.5 border-b border-white/5">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-pop shrink-0">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="min-w-0">
+        <div class="text-white font-semibold tracking-tight" data-i18n="brand">لومن</div>
+        <div class="text-[11px] text-ink-400 -mt-0.5" data-i18n="brandSub">نظام إدارة المبيعات</div>
+      </div>
+    </div>
+
+    <!-- Workspace -->
+    <button class="mx-3 mt-3 px-3 py-2 rounded-lg flex items-center justify-between hover:bg-white/5 text-start">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[11px] font-semibold shrink-0">AC</div>
+        <div class="min-w-0">
+          <div class="text-sm text-white truncate">Acme Co.</div>
+          <div class="text-[11px] text-ink-400" data-i18n="workspace">مساحة عمل المبيعات</div>
+        </div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 15l5 5 5-5"/><path d="M7 9l5-5 5 5"/></svg>
+    </button>
+
+    <!-- Nav -->
+    <nav class="flex-1 px-3 mt-4 space-y-0.5 overflow-y-auto scrollbar-thin">
+      <div class="px-2 pb-1.5 text-[11px] uppercase tracking-wider text-ink-500 font-medium" data-i18n="navWorkspace">مساحة العمل</div>
+
+      <a href="#" data-page="dashboard" class="nav-link active flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-white/5">
+        <svg class="nav-icon text-ink-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        <span class="flex-1 truncate" data-i18n="dashboard">لوحة التحكم</span>
+      </a>
+      <a href="#" data-page="leads" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-white/5">
+        <svg class="nav-icon text-ink-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+        <span class="flex-1 truncate" data-i18n="leads">الفرص</span>
+        <span class="text-[11px] font-medium text-ink-300 bg-white/5 px-1.5 py-0.5 rounded shrink-0 num">128</span>
+      </a>
+      <a href="#" data-page="followups" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-white/5">
+        <svg class="nav-icon text-ink-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <span class="flex-1 truncate" data-i18n="followups">المتابعات</span>
+        <span class="text-[11px] font-medium text-amber-300 bg-amber-500/15 px-1.5 py-0.5 rounded shrink-0 num">7</span>
+      </a>
+      <a href="#" data-page="clients" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-white/5">
+        <svg class="nav-icon text-ink-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span data-i18n="clients">العملاء</span>
+      </a>
+      <a href="#" data-page="reports" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-white/5">
+        <svg class="nav-icon text-ink-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
+        <span data-i18n="reports">التقارير</span>
+      </a>
+
+      <div class="px-2 pt-5 pb-1.5 text-[11px] uppercase tracking-wider text-ink-500 font-medium" data-i18n="account">الحساب</div>
+      <a href="#" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-white/5">
+        <svg class="nav-icon text-ink-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span data-i18n="settings">الإعدادات</span>
+      </a>
+
+      <!-- LANGUAGE SWITCHER -->
+      <button id="lang-toggle" type="button" class="nav-link w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-white/5">
+        <svg class="nav-icon text-ink-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span class="flex-1 text-start" data-i18n="langSwitchTo">English</span>
+        <span class="text-[10px] uppercase tracking-wide bg-white/5 px-1.5 py-0.5 rounded text-ink-400 shrink-0" data-i18n="langCode">EN</span>
+      </button>
+    </nav>
+
+    <!-- User card -->
+    <div class="m-3 p-3 rounded-xl bg-white/5 flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-white text-xs font-semibold shrink-0">SA</div>
+      <div class="flex-1 min-w-0">
+        <div class="text-sm text-white font-medium truncate" data-i18n="userName">سارة أحمد</div>
+        <div class="text-[11px] text-ink-400 truncate" data-i18n="userRole">مدير المبيعات</div>
+      </div>
+      <button class="text-ink-400 hover:text-white shrink-0">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-flip-rtl><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ============= MAIN ============= -->
+  <main class="flex-1 ms-64 min-w-0">
+
+    <!-- Topbar -->
+    <header class="h-16 sticky top-0 z-20 bg-white/80 backdrop-blur border-b border-ink-100 flex items-center px-7 gap-4">
+      <div class="flex items-center gap-2 text-sm text-ink-500">
+        <span class="text-ink-900 font-medium" id="crumb" data-i18n="dashboard">لوحة التحكم</span>
+      </div>
+
+      <div class="flex-1 max-w-md mx-auto relative">
+        <svg class="absolute start-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input class="w-full ps-9 pe-12 h-9 rounded-lg bg-ink-50 border border-transparent text-sm placeholder-ink-400 ring-focus" placeholder="ابحث في الفرص والعملاء…" data-i18n-ph="search">
+        <kbd class="absolute end-2 top-1/2 -translate-y-1/2 text-[11px] text-ink-400 bg-white border border-ink-200 px-1.5 py-0.5 rounded font-mono">⌘K</kbd>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <button class="h-9 w-9 rounded-lg hover:bg-ink-50 flex items-center justify-center text-ink-500 relative">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span class="absolute top-1.5 end-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
+        </button>
+        <button class="h-9 px-3 rounded-lg bg-ink-900 text-white text-sm font-medium hover:bg-ink-800 flex items-center gap-1.5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          <span data-i18n="newLead">فرصة جديدة</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ============== DASHBOARD ============== -->
+    <section id="page-dashboard" class="page active px-7 py-7 max-w-[1400px] mx-auto">
+      <div class="flex items-end justify-between mb-7 flex-wrap gap-4">
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight text-ink-900"><span data-i18n="greeting">صباح الخير</span>، <span data-i18n="userFirstName">سارة</span></h1>
+          <p class="text-sm text-ink-500 mt-1" data-i18n="dashSub">إليك ما يجري في خط مبيعاتك اليوم.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="flex items-center bg-white border border-ink-200 rounded-lg p-0.5 text-sm">
+            <button class="px-3 py-1.5 rounded-md text-ink-500 hover:text-ink-900 num">7d</button>
+            <button class="px-3 py-1.5 rounded-md bg-ink-900 text-white num">30d</button>
+            <button class="px-3 py-1.5 rounded-md text-ink-500 hover:text-ink-900 num">90d</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-xl border border-ink-100 shadow-soft p-5">
+          <div class="flex items-center justify-between">
+            <div class="text-sm text-ink-500" data-i18n="kpiLeadsToday">الفرص اليوم</div>
+            <div class="w-7 h-7 rounded-md bg-ink-50 flex items-center justify-center text-ink-500 shrink-0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+            </div>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <div class="text-3xl font-semibold tracking-tight text-ink-900 num">24</div>
+            <div class="text-xs font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded num">+12%</div>
+          </div>
+          <div class="mt-3 flex items-end gap-0.5 h-8 chart-ltr">
+            <div class="w-1.5 bg-ink-100 rounded-sm" style="height:35%"></div>
+            <div class="w-1.5 bg-ink-100 rounded-sm" style="height:50%"></div>
+            <div class="w-1.5 bg-ink-100 rounded-sm" style="height:25%"></div>
+            <div class="w-1.5 bg-ink-100 rounded-sm" style="height:70%"></div>
+            <div class="w-1.5 bg-ink-100 rounded-sm" style="height:60%"></div>
+            <div class="w-1.5 bg-ink-100 rounded-sm" style="height:80%"></div>
+            <div class="w-1.5 bg-ink-200 rounded-sm" style="height:45%"></div>
+            <div class="w-1.5 bg-ink-200 rounded-sm" style="height:65%"></div>
+            <div class="w-1.5 bg-ink-200 rounded-sm" style="height:55%"></div>
+            <div class="w-1.5 bg-ink-300 rounded-sm" style="height:75%"></div>
+            <div class="w-1.5 bg-ink-300 rounded-sm" style="height:50%"></div>
+            <div class="w-1.5 bg-brand-500 rounded-sm" style="height:90%"></div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-ink-100 shadow-soft p-5">
+          <div class="flex items-center justify-between">
+            <div class="text-sm text-ink-500" data-i18n="kpiFollowupsToday">متابعات اليوم</div>
+            <div class="w-7 h-7 rounded-md bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <div class="text-3xl font-semibold tracking-tight text-ink-900 num">7</div>
+            <div class="text-xs font-medium text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded"><span class="num">3</span> <span data-i18n="overdue">متأخرة</span></div>
+          </div>
+          <div class="mt-3 flex items-center gap-2">
+            <div class="flex-1 h-1.5 bg-ink-100 rounded-full overflow-hidden">
+              <div class="h-full bg-amber-500 rounded-full" style="width:57%"></div>
+            </div>
+            <span class="text-[11px] text-ink-500 font-medium num">4/7 <span data-i18n="done">منجزة</span></span>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-ink-100 shadow-soft p-5">
+          <div class="flex items-center justify-between">
+            <div class="text-sm text-ink-500" data-i18n="kpiConverted">الفرص المحولة</div>
+            <div class="w-7 h-7 rounded-md bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <div class="text-3xl font-semibold tracking-tight text-ink-900 num">42</div>
+            <div class="text-xs font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded num">+8%</div>
+          </div>
+          <div class="mt-3 text-xs text-ink-500"><span class="num">$184k</span> <span class="text-ink-400" data-i18n="totalValue">القيمة الإجمالية</span></div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-ink-100 shadow-soft p-5">
+          <div class="flex items-center justify-between">
+            <div class="text-sm text-ink-500" data-i18n="kpiRejected">الفرص المرفوضة</div>
+            <div class="w-7 h-7 rounded-md bg-rose-50 flex items-center justify-center text-rose-600 shrink-0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </div>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <div class="text-3xl font-semibold tracking-tight text-ink-900 num">11</div>
+            <div class="text-xs font-medium text-ink-500 bg-ink-100 px-1.5 py-0.5 rounded num">−4%</div>
+          </div>
+          <div class="mt-3 text-xs text-ink-500"><span data-i18n="topReason">السبب الأبرز</span>: <span class="text-ink-700 font-medium" data-i18n="reasonPrice">السعر</span></div>
+        </div>
+      </div>
+
+      <!-- Charts row -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+        <div class="lg:col-span-2 bg-white rounded-xl border border-ink-100 shadow-soft p-5">
+          <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <div>
+              <div class="text-sm font-medium text-ink-900" data-i18n="conversionRate">معدل التحويل</div>
+              <div class="text-xs text-ink-500 mt-0.5" data-i18n="conversionSub">الفرص المحولة خلال آخر 12 أسبوعاً</div>
+            </div>
+            <div class="flex items-center gap-3 text-xs">
+              <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm bg-brand-500"></span><span class="text-ink-500" data-i18n="thisPeriod">هذه الفترة</span></div>
+              <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm bg-ink-200"></span><span class="text-ink-500" data-i18n="prevPeriod">الفترة السابقة</span></div>
+            </div>
+          </div>
+          <svg viewBox="0 0 600 200" class="w-full h-48 chart-ltr">
+            <defs><linearGradient id="g1" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#3b6ef5" stop-opacity="0.18"/><stop offset="100%" stop-color="#3b6ef5" stop-opacity="0"/></linearGradient></defs>
+            <g stroke="#eef0f2" stroke-width="1"><line x1="0" y1="40" x2="600" y2="40"/><line x1="0" y1="90" x2="600" y2="90"/><line x1="0" y1="140" x2="600" y2="140"/><line x1="0" y1="190" x2="600" y2="190"/></g>
+            <path d="M0,150 L50,140 L100,145 L150,130 L200,135 L250,120 L300,125 L350,115 L400,120 L450,110 L500,115 L550,105 L600,108" fill="none" stroke="#dde0e5" stroke-width="2" stroke-linecap="round"/>
+            <path d="M0,160 L50,140 L100,150 L150,110 L200,120 L250,90 L300,95 L350,70 L400,80 L450,55 L500,60 L550,40 L600,45 L600,200 L0,200 Z" fill="url(#g1)"/>
+            <path d="M0,160 L50,140 L100,150 L150,110 L200,120 L250,90 L300,95 L350,70 L400,80 L450,55 L500,60 L550,40 L600,45" fill="none" stroke="#3b6ef5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="600" cy="45" r="4" fill="#3b6ef5"/>
+            <circle cx="600" cy="45" r="8" fill="#3b6ef5" opacity="0.2"/>
+          </svg>
+        </div>
+
+        <div class="bg-white rounded-xl border border-ink-100 shadow-soft p-5">
+          <div class="mb-4">
+            <div class="text-sm font-medium text-ink-900" data-i18n="rejectionReasons">أسباب الرفض</div>
+            <div class="text-xs text-ink-500 mt-0.5" data-i18n="rejectionSub">لماذا لم تُغلق الصفقات</div>
+          </div>
+          <div class="space-y-3.5">
+            <div>
+              <div class="flex items-center justify-between text-sm mb-1.5">
+                <span class="text-ink-700" data-i18n="rPrice">السعر مرتفع</span>
+                <span class="text-ink-500 font-medium num">42%</span>
+              </div>
+              <div class="h-1.5 bg-ink-100 rounded-full overflow-hidden"><div class="h-full bg-rose-500 rounded-full" style="width:42%"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between text-sm mb-1.5">
+                <span class="text-ink-700" data-i18n="rNoBudget">لا توجد ميزانية</span>
+                <span class="text-ink-500 font-medium num">23%</span>
+              </div>
+              <div class="h-1.5 bg-ink-100 rounded-full overflow-hidden"><div class="h-full bg-rose-400 rounded-full" style="width:23%"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between text-sm mb-1.5">
+                <span class="text-ink-700" data-i18n="rCompetitor">اختار منافساً</span>
+                <span class="text-ink-500 font-medium num">18%</span>
+              </div>
+              <div class="h-1.5 bg-ink-100 rounded-full overflow-hidden"><div class="h-full bg-rose-300 rounded-full" style="width:18%"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between text-sm mb-1.5">
+                <span class="text-ink-700" data-i18n="rTiming">توقيت غير مناسب</span>
+                <span class="text-ink-500 font-medium num">11%</span>
+              </div>
+              <div class="h-1.5 bg-ink-100 rounded-full overflow-hidden"><div class="h-full bg-rose-200 rounded-full" style="width:11%"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between text-sm mb-1.5">
+                <span class="text-ink-700" data-i18n="rOther">أخرى</span>
+                <span class="text-ink-500 font-medium num">6%</span>
+              </div>
+              <div class="h-1.5 bg-ink-100 rounded-full overflow-hidden"><div class="h-full bg-ink-300 rounded-full" style="width:6%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent activity + pipeline -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="lg:col-span-2 bg-white rounded-xl border border-ink-100 shadow-soft">
+          <div class="px-5 py-4 border-b border-ink-100 flex items-center justify-between">
+            <div class="text-sm font-medium text-ink-900" data-i18n="recentActivity">النشاط الأخير</div>
+            <a href="#" class="text-xs text-brand-600 hover:text-brand-700 font-medium"><span data-i18n="viewAll">عرض الكل</span> <span data-flip-rtl>→</span></a>
+          </div>
+          <ul class="divide-y divide-ink-100">
+            <li class="px-5 py-3.5 flex items-center gap-3 hover:bg-ink-50/50">
+              <div class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm text-ink-900"><span class="font-medium">Cedar Coffee Co.</span> <span data-i18n="movedToConverted">تم نقلها إلى محولة</span></div>
+                <div class="text-xs text-ink-500"><span data-i18n="by">بواسطة</span> يوسف · <span data-i18n="ago12m">منذ 12 د</span></div>
+              </div>
+              <span class="text-xs px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-medium num">+$2,400</span>
+            </li>
+            <li class="px-5 py-3.5 flex items-center gap-3 hover:bg-ink-50/50">
+              <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm text-ink-900"><span data-i18n="followupScheduledWith">تمت جدولة متابعة مع</span> <span class="font-medium">Atlas Bookstore</span></div>
+                <div class="text-xs text-ink-500" data-i18n="tomorrow10">غداً، 10:00 صباحاً</div>
+              </div>
+            </li>
+            <li class="px-5 py-3.5 flex items-center gap-3 hover:bg-ink-50/50">
+              <div class="w-8 h-8 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm text-ink-900"><span data-i18n="called">تم الاتصال بـ</span> <span class="font-medium">Marina Hotel</span> · <span class="num">8</span> <span data-i18n="min">د</span></div>
+                <div class="text-xs text-ink-500"><span data-i18n="by">بواسطة</span> سارة · <span data-i18n="ago1h">منذ ساعة</span></div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="bg-white rounded-xl border border-ink-100 shadow-soft p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div class="text-sm font-medium text-ink-900" data-i18n="pipeline">خط المبيعات</div>
+            <span class="text-xs text-ink-500"><span class="num">128</span> <span data-i18n="leadCount">فرصة</span></span>
+          </div>
+          <div class="space-y-3">
+            <div>
+              <div class="flex items-center justify-between mb-1"><span class="flex items-center gap-2 text-sm text-ink-700"><span class="w-2 h-2 rounded-full bg-ink-400"></span><span data-i18n="sNew">جديدة</span></span><span class="text-sm text-ink-500 font-medium num">38</span></div>
+              <div class="h-1.5 bg-ink-100 rounded-full overflow-hidden chart-ltr"><div class="h-full bg-ink-400 rounded-full" style="width:30%"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1"><span class="flex items-center gap-2 text-sm text-ink-700"><span class="w-2 h-2 rounded-full bg-amber-500"></span><span data-i18n="sFollowup">متابعة</span></span><span class="text-sm text-ink-500 font-medium num">29</span></div>
+              <div class="h-1.5 bg-ink-100 rounded-full overflow-hidden chart-ltr"><div class="h-full bg-amber-500 rounded-full" style="width:23%"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1"><span class="flex items-center gap-2 text-sm text-ink-700"><span class="w-2 h-2 rounded-full bg-brand-500"></span><span data-i18n="sInterested">مهتمة</span></span><span class="text-sm text-ink-500 font-medium num">22</span></div>
+              <div class="h-1.5 bg-ink-100 rounded-full overflow-hidden chart-ltr"><div class="h-full bg-brand-500 rounded-full" style="width:17%"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1"><span class="flex items-center gap-2 text-sm text-ink-700"><span class="w-2 h-2 rounded-full bg-emerald-500"></span><span data-i18n="sConverted">محولة</span></span><span class="text-sm text-ink-500 font-medium num">28</span></div>
+              <div class="h-1.5 bg-ink-100 rounded-full overflow-hidden chart-ltr"><div class="h-full bg-emerald-500 rounded-full" style="width:22%"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1"><span class="flex items-center gap-2 text-sm text-ink-700"><span class="w-2 h-2 rounded-full bg-rose-500"></span><span data-i18n="sRejected">مرفوضة</span></span><span class="text-sm text-ink-500 font-medium num">11</span></div>
+              <div class="h-1.5 bg-ink-100 rounded-full overflow-hidden chart-ltr"><div class="h-full bg-rose-500 rounded-full" style="width:8%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== LEADS (Kanban) ============== -->
+    <section id="page-leads" class="page px-7 py-7 max-w-[1600px] mx-auto">
+      <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight text-ink-900" data-i18n="leads">الفرص</h1>
+          <p class="text-sm text-ink-500 mt-1"><span class="num">128</span> <span data-i18n="leadsInPipeline">فرصة في خط المبيعات</span> · <span class="num">42</span> <span data-i18n="closedThisMonth">مغلقة هذا الشهر</span></p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="h-9 px-3 rounded-lg border border-ink-200 bg-white text-sm font-medium text-ink-700 hover:bg-ink-50 flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-flip-rtl><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+            <span data-i18n="export">تصدير</span>
+          </button>
+          <button class="h-9 px-3 rounded-lg bg-ink-900 text-white text-sm font-medium hover:bg-ink-800 flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            <span data-i18n="newLead">فرصة جديدة</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter / view bar -->
+      <div class="bg-white rounded-xl border border-ink-100 shadow-soft p-2 flex items-center gap-2 mb-5 flex-wrap">
+        <div class="flex items-center bg-ink-50 rounded-lg p-0.5">
+          <button class="px-3 h-8 rounded-md text-sm font-medium bg-white shadow-soft text-ink-900 flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="11" rx="1"/></svg>
+            <span data-i18n="kanban">كانبان</span>
+          </button>
+          <button class="px-3 h-8 rounded-md text-sm font-medium text-ink-500 hover:text-ink-900 flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+            <span data-i18n="table">جدول</span>
+          </button>
+        </div>
+        <div class="w-px h-6 bg-ink-100 mx-1"></div>
+        <button class="h-8 px-2.5 rounded-md text-sm text-ink-700 hover:bg-ink-50 flex items-center gap-1.5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+          <span data-i18n="filter">تصفية</span>
+          <span class="text-[10px] bg-ink-100 text-ink-600 px-1 py-0.5 rounded num">2</span>
+        </button>
+        <button class="h-8 px-2.5 rounded-md text-sm text-ink-700 hover:bg-ink-50 flex items-center gap-1.5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M7 12h10M11 18h2"/></svg>
+          <span data-i18n="sortLastContact">ترتيب: آخر اتصال</span>
+        </button>
+        <button class="h-8 px-2.5 rounded-md text-sm text-ink-700 hover:bg-ink-50 flex items-center gap-1.5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>
+          <span data-i18n="agentAll">الموظف: الكل</span>
+        </button>
+      </div>
+
+      <!-- Kanban -->
+      <div id="kanban-board" class="overflow-x-auto pb-4">
+        <div class="flex gap-4 min-w-max">
+
+          <!-- Col: New -->
+          <div class="kanban-col w-80">
+            <div class="flex items-center justify-between px-1 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-ink-400"></span>
+                <span class="text-sm font-semibold text-ink-900" data-i18n="sNew">جديدة</span>
+                <span class="text-xs text-ink-500 bg-ink-100 px-1.5 py-0.5 rounded num">38</span>
+              </div>
+              <button class="w-6 h-6 rounded-md hover:bg-ink-100 text-ink-500 flex items-center justify-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+            </div>
+            <div class="space-y-2.5 bg-ink-50/60 rounded-xl p-2 min-h-[200px]">
+              <div class="lead-card bg-white rounded-lg border border-ink-100 p-3.5 cursor-pointer">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="font-medium text-sm text-ink-900">Olive & Oak Café</div>
+                  <span class="text-[10px] uppercase tracking-wide font-semibold text-ink-500 bg-ink-100 px-1.5 py-0.5 rounded shrink-0" data-i18n="sNew">جديدة</span>
+                </div>
+                <div class="text-xs text-ink-500 mt-1"><span data-i18n="cityRiyadh">الرياض</span> · <span class="num">12</span> <span data-i18n="employees">موظفين</span></div>
+                <div class="mt-3 flex items-center justify-between text-xs">
+                  <span class="text-ink-500"><span data-i18n="last">آخر</span> <span class="text-ink-700">—</span></span>
+                  <span class="flex items-center gap-1 text-ink-500"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span data-i18n="today">اليوم</span></span>
+                </div>
+                <div class="mt-2.5 flex items-center justify-between">
+                  <div class="flex"><div class="w-5 h-5 rounded-full bg-violet-500 ring-2 ring-white text-white text-[10px] flex items-center justify-center font-medium">SA</div></div>
+                  <span class="text-[11px] font-medium text-ink-400 num">#L-1042</span>
+                </div>
+              </div>
+              <div class="lead-card bg-white rounded-lg border border-ink-100 p-3.5 cursor-pointer">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="font-medium text-sm text-ink-900">Marina Hotel</div>
+                  <span class="text-[10px] uppercase tracking-wide font-semibold text-ink-500 bg-ink-100 px-1.5 py-0.5 rounded shrink-0" data-i18n="sNew">جديدة</span>
+                </div>
+                <div class="text-xs text-ink-500 mt-1"><span data-i18n="cityJeddah">جدة</span> · <span data-i18n="hospitality">ضيافة</span></div>
+                <div class="mt-3 flex items-center justify-between text-xs">
+                  <span class="text-ink-500"><span data-i18n="last">آخر</span> <span class="text-ink-700">—</span></span>
+                  <span class="text-ink-500" data-i18n="tomorrow">غداً</span>
+                </div>
+                <div class="mt-2.5 flex items-center justify-between">
+                  <div class="flex"><div class="w-5 h-5 rounded-full bg-emerald-500 ring-2 ring-white text-white text-[10px] flex items-center justify-center font-medium">YA</div></div>
+                  <span class="text-[11px] font-medium text-ink-400 num">#L-1041</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Col: Follow-up -->
+          <div class="kanban-col w-80">
+            <div class="flex items-center justify-between px-1 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                <span class="text-sm font-semibold text-ink-900" data-i18n="sFollowup">متابعة</span>
+                <span class="text-xs text-ink-500 bg-ink-100 px-1.5 py-0.5 rounded num">29</span>
+              </div>
+              <button class="w-6 h-6 rounded-md hover:bg-ink-100 text-ink-500 flex items-center justify-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+            </div>
+            <div class="space-y-2.5 bg-amber-50/40 rounded-xl p-2 min-h-[200px]">
+              <div class="lead-card bg-white rounded-lg border border-ink-100 p-3.5 cursor-pointer border-l-2 border-l-rose-500">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="font-medium text-sm text-ink-900">Atlas Bookstore</div>
+                  <span class="text-[10px] uppercase tracking-wide font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded shrink-0" data-i18n="sFollowupShort">متابعة</span>
+                </div>
+                <div class="text-xs text-ink-500 mt-1"><span data-i18n="cityRiyadh">الرياض</span> · <span data-i18n="retail">تجزئة</span></div>
+                <div class="mt-3 flex items-center justify-between text-xs">
+                  <span class="text-ink-500"><span data-i18n="last">آخر</span> <span class="text-ink-700"><span data-i18n="d2ago">منذ يومين</span></span></span>
+                  <span class="text-rose-600 font-medium" data-i18n="overdue1d">متأخر بـ يوم</span>
+                </div>
+                <div class="mt-2.5 flex items-center justify-between">
+                  <div class="flex"><div class="w-5 h-5 rounded-full bg-violet-500 ring-2 ring-white text-white text-[10px] flex items-center justify-center font-medium">SA</div></div>
+                  <span class="text-[11px] font-medium text-ink-400 num">#L-1038</span>
+                </div>
+              </div>
+              <div class="lead-card bg-white rounded-lg border border-ink-100 p-3.5 cursor-pointer">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="font-medium text-sm text-ink-900">Northwind Bakery</div>
+                  <span class="text-[10px] uppercase tracking-wide font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded shrink-0" data-i18n="sFollowupShort">متابعة</span>
+                </div>
+                <div class="text-xs text-ink-500 mt-1"><span data-i18n="cityRiyadh">الرياض</span> · <span class="num">3</span> <span data-i18n="branches">فروع</span></div>
+                <div class="mt-3 flex items-center justify-between text-xs">
+                  <span class="text-ink-500"><span data-i18n="last">آخر</span> <span class="text-ink-700"><span data-i18n="d1ago">منذ يوم</span></span></span>
+                  <span class="text-amber-700 font-medium" data-i18n="in2h">خلال ساعتين</span>
+                </div>
+                <div class="mt-2.5 flex items-center justify-between">
+                  <div class="flex"><div class="w-5 h-5 rounded-full bg-emerald-500 ring-2 ring-white text-white text-[10px] flex items-center justify-center font-medium">YA</div></div>
+                  <span class="text-[11px] font-medium text-ink-400 num">#L-1035</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Col: Interested -->
+          <div class="kanban-col w-80">
+            <div class="flex items-center justify-between px-1 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-brand-500"></span>
+                <span class="text-sm font-semibold text-ink-900" data-i18n="sInterested">مهتمة</span>
+                <span class="text-xs text-ink-500 bg-ink-100 px-1.5 py-0.5 rounded num">22</span>
+              </div>
+              <button class="w-6 h-6 rounded-md hover:bg-ink-100 text-ink-500 flex items-center justify-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+            </div>
+            <div class="space-y-2.5 bg-brand-50/40 rounded-xl p-2 min-h-[200px]">
+              <div class="lead-card bg-white rounded-lg border border-ink-100 p-3.5 cursor-pointer">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="font-medium text-sm text-ink-900">Cedar Coffee Co.</div>
+                  <span class="text-[10px] uppercase tracking-wide font-semibold text-brand-700 bg-brand-100 px-1.5 py-0.5 rounded shrink-0" data-i18n="sHot">ساخنة</span>
+                </div>
+                <div class="text-xs text-ink-500 mt-1"><span data-i18n="cityRiyadh">الرياض</span> · <span class="num">5</span> <span data-i18n="cafes">مقاهي</span> · <span class="num">$2.4k</span></div>
+                <div class="mt-3 flex items-center justify-between text-xs">
+                  <span class="text-ink-500"><span data-i18n="last">آخر</span> <span class="text-ink-700"><span data-i18n="h5ago">منذ 5 س</span></span></span>
+                  <span class="text-emerald-600 font-medium" data-i18n="in1d">خلال يوم</span>
+                </div>
+                <div class="mt-2.5 flex items-center justify-between">
+                  <div class="flex"><div class="w-5 h-5 rounded-full bg-violet-500 ring-2 ring-white text-white text-[10px] flex items-center justify-center font-medium">SA</div><div class="w-5 h-5 rounded-full bg-emerald-500 ring-2 ring-white text-white text-[10px] flex items-center justify-center font-medium -ms-1.5">YA</div></div>
+                  <span class="text-[11px] font-medium text-ink-400 num">#L-1029</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Col: Converted -->
+          <div class="kanban-col w-80">
+            <div class="flex items-center justify-between px-1 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span class="text-sm font-semibold text-ink-900" data-i18n="sConverted">محولة</span>
+                <span class="text-xs text-ink-500 bg-ink-100 px-1.5 py-0.5 rounded num">28</span>
+              </div>
+            </div>
+            <div class="space-y-2.5 bg-emerald-50/40 rounded-xl p-2 min-h-[200px]">
+              <div class="lead-card bg-white rounded-lg border border-ink-100 p-3.5 cursor-pointer">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="font-medium text-sm text-ink-900">Harbor Logistics</div>
+                  <span class="text-[10px] uppercase tracking-wide font-semibold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded shrink-0" data-i18n="sWon">رابحة</span>
+                </div>
+                <div class="text-xs text-ink-500 mt-1"><span data-i18n="cityJeddah">جدة</span> · <span class="num">$12.4k</span></div>
+                <div class="mt-3 flex items-center justify-between text-xs">
+                  <span class="text-ink-500"><span data-i18n="closed">مغلقة</span> <span class="text-ink-700"><span data-i18n="d3ago">منذ 3 أيام</span></span></span>
+                  <span class="text-emerald-600 font-medium num">+$12.4k</span>
+                </div>
+                <div class="mt-2.5 flex items-center justify-between">
+                  <div class="flex"><div class="w-5 h-5 rounded-full bg-emerald-500 ring-2 ring-white text-white text-[10px] flex items-center justify-center font-medium">YA</div></div>
+                  <span class="text-[11px] font-medium text-ink-400 num">#L-1018</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Col: Rejected -->
+          <div class="kanban-col w-80">
+            <div class="flex items-center justify-between px-1 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                <span class="text-sm font-semibold text-ink-900" data-i18n="sRejected">مرفوضة</span>
+                <span class="text-xs text-ink-500 bg-ink-100 px-1.5 py-0.5 rounded num">11</span>
+              </div>
+            </div>
+            <div class="space-y-2.5 bg-rose-50/40 rounded-xl p-2 min-h-[200px]">
+              <div class="lead-card bg-white rounded-lg border border-ink-100 p-3.5 cursor-pointer opacity-90">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="font-medium text-sm text-ink-900">Quick Wash</div>
+                  <span class="text-[10px] uppercase tracking-wide font-semibold text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded shrink-0" data-i18n="sLost">خاسرة</span>
+                </div>
+                <div class="text-xs text-ink-500 mt-1"><span data-i18n="reason">السبب</span>: <span data-i18n="rPrice">السعر مرتفع</span></div>
+                <div class="mt-3 flex items-center justify-between text-xs">
+                  <span class="text-ink-500"><span data-i18n="closed">مغلقة</span> <span class="text-ink-700"><span data-i18n="d5ago">منذ 5 أيام</span></span></span>
+                </div>
+                <div class="mt-2.5 flex items-center justify-between">
+                  <div class="flex"><div class="w-5 h-5 rounded-full bg-rose-500 ring-2 ring-white text-white text-[10px] flex items-center justify-center font-medium">MK</div></div>
+                  <span class="text-[11px] font-medium text-ink-400 num">#L-1004</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== FOLLOWUPS ============== -->
+    <section id="page-followups" class="page px-7 py-7 max-w-[1100px] mx-auto">
+      <div class="bg-gradient-to-br from-ink-900 to-ink-950 text-white rounded-2xl p-7 mb-6 relative overflow-hidden">
+        <div class="absolute -end-12 -top-12 w-64 h-64 rounded-full bg-brand-500/20 blur-3xl"></div>
+        <div class="absolute end-20 bottom-0 w-48 h-48 rounded-full bg-emerald-500/10 blur-3xl"></div>
+        <div class="relative">
+          <div class="text-sm text-ink-300 font-medium" data-i18n="todayDate">اليوم، 29 أبريل</div>
+          <h1 class="text-3xl font-semibold tracking-tight mt-1"><span data-i18n="youHave">لديك</span> <span class="text-brand-400"><span class="num">7</span> <span data-i18n="leadsToFollow">فرص للمتابعة</span></span> <span data-i18n="todaySimple">اليوم</span></h1>
+          <p class="text-sm text-ink-300 mt-2 max-w-md"><span data-i18n="stayOnRhythm">حافظ على إيقاعك.</span> <span class="text-rose-300 font-medium"><span class="num">3</span> <span data-i18n="overdue">متأخرة</span></span> — <span data-i18n="handleFirst">تعامل معها أولاً للحفاظ على دفء الصفقات.</span></p>
+          <div class="mt-5 flex items-center gap-2">
+            <button class="h-9 px-4 rounded-lg bg-white text-ink-900 text-sm font-semibold hover:bg-ink-100" data-i18n="startWithOverdue">ابدأ بالمتأخرة</button>
+            <button class="h-9 px-4 rounded-lg bg-white/10 text-white text-sm font-medium hover:bg-white/15 border border-white/10" data-i18n="viewCalendar">عرض التقويم</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1 mb-4 border-b border-ink-100 overflow-x-auto">
+        <button class="px-4 py-2.5 text-sm font-medium text-ink-900 border-b-2 border-ink-900 -mb-px flex items-center gap-2 whitespace-nowrap"><span data-i18n="overdueTab">المتأخرة</span> <span class="text-[11px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-semibold num">3</span></button>
+        <button class="px-4 py-2.5 text-sm font-medium text-ink-500 hover:text-ink-900 flex items-center gap-2 whitespace-nowrap"><span data-i18n="todayTab">اليوم</span> <span class="text-[11px] px-1.5 py-0.5 rounded bg-ink-100 text-ink-600 font-semibold num">4</span></button>
+        <button class="px-4 py-2.5 text-sm font-medium text-ink-500 hover:text-ink-900 flex items-center gap-2 whitespace-nowrap"><span data-i18n="tomorrowTab">غداً</span> <span class="text-[11px] px-1.5 py-0.5 rounded bg-ink-100 text-ink-600 font-semibold num">5</span></button>
+        <button class="px-4 py-2.5 text-sm font-medium text-ink-500 hover:text-ink-900 flex items-center gap-2 whitespace-nowrap"><span data-i18n="weekTab">هذا الأسبوع</span> <span class="text-[11px] px-1.5 py-0.5 rounded bg-ink-100 text-ink-600 font-semibold num">14</span></button>
+      </div>
+
+      <div class="bg-white rounded-xl border border-ink-100 shadow-soft divide-y divide-ink-100">
+        <div class="px-5 py-4 flex items-center gap-4 hover:bg-ink-50/40 group">
+          <button class="w-5 h-5 rounded-full border-2 border-ink-300 hover:border-emerald-500 hover:bg-emerald-50 flex-shrink-0"></button>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="font-medium text-sm text-ink-900">Atlas Bookstore</span>
+              <span class="text-[10px] uppercase tracking-wide font-semibold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded" data-i18n="sFollowupShort">متابعة</span>
+            </div>
+            <div class="text-xs text-ink-500 mt-0.5"><span data-i18n="pricingPresentation">عرض الأسعار</span> · <span data-i18n="scheduled">مجدولة</span> <span class="num">28 أبريل 10:00</span></div>
+          </div>
+          <div class="text-end">
+            <div class="inline-flex items-center gap-1 text-xs font-semibold text-rose-600 bg-rose-50 px-2 py-1 rounded-md" data-i18n="overdue1d">متأخر بـ يوم</div>
+          </div>
+          <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+            <button class="h-8 px-2.5 rounded-md text-xs font-medium text-ink-700 bg-ink-100 hover:bg-ink-200 flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span data-i18n="callBtn">اتصال</span></button>
+            <button class="h-8 px-2.5 rounded-md text-xs font-medium text-ink-700 bg-ink-100 hover:bg-ink-200" data-i18n="reschedule">إعادة جدولة</button>
+          </div>
+        </div>
+        <div class="px-5 py-4 flex items-center gap-4 hover:bg-ink-50/40 group bg-amber-50/20">
+          <button class="w-5 h-5 rounded-full border-2 border-ink-300 hover:border-emerald-500 hover:bg-emerald-50 flex-shrink-0"></button>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="font-medium text-sm text-ink-900">Cedar Coffee Co.</span>
+              <span class="text-[10px] uppercase tracking-wide font-semibold text-brand-700 bg-brand-50 px-1.5 py-0.5 rounded" data-i18n="sInterested">مهتمة</span>
+            </div>
+            <div class="text-xs text-ink-500 mt-0.5"><span data-i18n="pricingPresentation">عرض الأسعار</span> · <span data-i18n="todaySimple">اليوم</span> <span class="num">10:00</span></div>
+          </div>
+          <div class="text-end">
+            <div class="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-1 rounded-md" data-i18n="in2h">خلال ساعتين</div>
+          </div>
+        </div>
+        <div class="px-5 py-4 flex items-center gap-4 hover:bg-ink-50/40 group opacity-60">
+          <button class="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5"><path d="M20 6L9 17l-5-5"/></svg></button>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2"><span class="font-medium text-sm text-ink-500 line-through">Maple Dental</span></div>
+            <div class="text-xs text-ink-400 mt-0.5"><span data-i18n="completedAt">اكتملت في</span> <span class="num">9:42</span></div>
+          </div>
+          <div class="text-end"><span class="inline-flex items-center gap-1 text-xs text-emerald-700 font-medium" data-i18n="done2">تمت</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== CLIENTS ============== -->
+    <section id="page-clients" class="page px-7 py-7 max-w-[1400px] mx-auto">
+      <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight text-ink-900" data-i18n="clients">العملاء</h1>
+          <p class="text-sm text-ink-500 mt-1"><span class="num">42</span> <span data-i18n="active">نشط</span> · <span class="num">7</span> <span data-i18n="churnedThisQ">منسحبون هذا الربع</span></p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border border-ink-100 shadow-soft overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-ink-50">
+            <tr class="text-start text-xs text-ink-500 uppercase tracking-wider">
+              <th class="px-4 py-3 font-medium text-start" data-i18n="thClient">العميل</th>
+              <th class="px-4 py-3 font-medium text-start" data-i18n="thStatus">الحالة</th>
+              <th class="px-4 py-3 font-medium text-start" data-i18n="thPlan">الباقة</th>
+              <th class="px-4 py-3 font-medium text-start" data-i18n="thMRR">الإيراد الشهري</th>
+              <th class="px-4 py-3 font-medium text-start" data-i18n="thOwner">المالك</th>
+              <th class="px-4 py-3 font-medium text-start" data-i18n="thSince">منذ</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-ink-100">
+            <tr class="hover:bg-ink-50/50">
+              <td class="px-4 py-3"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-rose-500 text-white text-xs font-semibold flex items-center justify-center shrink-0">CC</div><div class="min-w-0"><div class="font-medium text-ink-900">Cedar Coffee Co.</div><div class="text-xs text-ink-500">cedar.coffee</div></div></div></td>
+              <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot"></span><span data-i18n="active">نشط</span></span></td>
+              <td class="px-4 py-3 text-ink-700" data-i18n="planGrowth">نمو</td>
+              <td class="px-4 py-3 font-medium text-ink-900 num">$240</td>
+              <td class="px-4 py-3"><div class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-violet-500 text-white text-[10px] font-medium flex items-center justify-center shrink-0">SA</div><span>سارة</span></div></td>
+              <td class="px-4 py-3 text-ink-500 num">يناير 2024</td>
+            </tr>
+            <tr class="hover:bg-ink-50/50">
+              <td class="px-4 py-3"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-500 text-white text-xs font-semibold flex items-center justify-center shrink-0">HL</div><div class="min-w-0"><div class="font-medium text-ink-900">Harbor Logistics</div><div class="text-xs text-ink-500">harbor.sa</div></div></div></td>
+              <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot"></span><span data-i18n="active">نشط</span></span></td>
+              <td class="px-4 py-3 text-ink-700" data-i18n="planEnt">مؤسسات</td>
+              <td class="px-4 py-3 font-medium text-ink-900 num">$1,240</td>
+              <td class="px-4 py-3"><div class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-emerald-500 text-white text-[10px] font-medium flex items-center justify-center shrink-0">YA</div><span>يوسف</span></div></td>
+              <td class="px-4 py-3 text-ink-500 num">مارس 2023</td>
+            </tr>
+            <tr class="hover:bg-ink-50/50">
+              <td class="px-4 py-3"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-400 to-amber-500 text-white text-xs font-semibold flex items-center justify-center shrink-0">PB</div><div class="min-w-0"><div class="font-medium text-ink-900">Pebble Studios</div><div class="text-xs text-ink-500">pebble.io</div></div></div></td>
+              <td class="px-4 py-3"><span class="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700 bg-amber-50 px-2 py-1 rounded-md"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span><span data-i18n="atRisk">في خطر</span></span></td>
+              <td class="px-4 py-3 text-ink-700" data-i18n="planGrowth">نمو</td>
+              <td class="px-4 py-3 font-medium text-ink-900 num">$580</td>
+              <td class="px-4 py-3"><div class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-rose-500 text-white text-[10px] font-medium flex items-center justify-center shrink-0">MK</div><span>منى</span></div></td>
+              <td class="px-4 py-3 text-ink-500 num">نوفمبر 2023</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============== REPORTS ============== -->
+    <section id="page-reports" class="page px-7 py-7 max-w-[1400px] mx-auto">
+      <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight text-ink-900" data-i18n="reports">التقارير</h1>
+          <p class="text-sm text-ink-500 mt-1"><span data-i18n="performanceOverview">نظرة عامة على الأداء</span> · <span data-i18n="last30">آخر 30 يوماً</span></p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="lg:col-span-2 bg-white rounded-xl border border-ink-100 shadow-soft p-5">
+          <div class="text-sm font-medium text-ink-900" data-i18n="salesFunnel">قمع المبيعات</div>
+          <div class="text-xs text-ink-500 mt-0.5 mb-5" data-i18n="funnelSub">من فرصة جديدة إلى صفقة مغلقة</div>
+          <div class="space-y-3">
+            <div><div class="h-12 rounded-lg bg-ink-100 flex items-center justify-between px-4" style="width:100%"><span class="text-sm font-medium text-ink-900" data-i18n="newLeadsLabel">فرص جديدة</span><span class="text-sm font-semibold text-ink-900 num">128</span></div></div>
+            <div><div class="h-12 rounded-lg bg-amber-100 flex items-center justify-between px-4" style="width:78%"><span class="text-sm font-medium text-amber-900" data-i18n="contactedLabel">تم التواصل</span><span class="text-sm font-semibold text-amber-900 num">100 · 78%</span></div></div>
+            <div><div class="h-12 rounded-lg bg-brand-100 flex items-center justify-between px-4" style="width:55%"><span class="text-sm font-medium text-brand-700" data-i18n="sInterested">مهتمة</span><span class="text-sm font-semibold text-brand-700 num">70 · 55%</span></div></div>
+            <div><div class="h-12 rounded-lg bg-emerald-100 flex items-center justify-between px-4" style="width:33%"><span class="text-sm font-medium text-emerald-800" data-i18n="sConverted">محولة</span><span class="text-sm font-semibold text-emerald-800 num">42 · 33%</span></div></div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-ink-100 shadow-soft p-5">
+          <div class="text-sm font-medium text-ink-900" data-i18n="rejectionReasons">أسباب الرفض</div>
+          <div class="text-xs text-ink-500 mt-0.5 mb-4"><span class="num">11</span> <span data-i18n="lostDeals">صفقات خاسرة</span></div>
+          <div class="relative w-40 h-40 mx-auto chart-ltr">
+            <svg viewBox="0 0 36 36" class="w-full h-full -rotate-90">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#fee2e2" stroke-width="3.6"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f43f5e" stroke-width="3.6" stroke-dasharray="42 100"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#fb7185" stroke-width="3.6" stroke-dasharray="23 100" stroke-dashoffset="-42"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#fda4af" stroke-width="3.6" stroke-dasharray="18 100" stroke-dashoffset="-65"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#fecdd3" stroke-width="3.6" stroke-dasharray="11 100" stroke-dashoffset="-83"/>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span class="text-2xl font-semibold text-ink-900 num">42%</span>
+              <span class="text-xs text-ink-500" data-i18n="topReasonShort">السبب الأبرز</span>
+            </div>
+          </div>
+          <ul class="mt-4 space-y-2 text-sm">
+            <li class="flex items-center justify-between"><span class="flex items-center gap-2 text-ink-700"><span class="w-2 h-2 rounded-sm bg-rose-500"></span><span data-i18n="reasonPrice">السعر</span></span><span class="font-medium text-ink-900 num">42%</span></li>
+            <li class="flex items-center justify-between"><span class="flex items-center gap-2 text-ink-700"><span class="w-2 h-2 rounded-sm bg-rose-400"></span><span data-i18n="rNoBudgetShort">لا ميزانية</span></span><span class="font-medium text-ink-900 num">23%</span></li>
+            <li class="flex items-center justify-between"><span class="flex items-center gap-2 text-ink-700"><span class="w-2 h-2 rounded-sm bg-rose-300"></span><span data-i18n="rCompShort">منافس</span></span><span class="font-medium text-ink-900 num">18%</span></li>
+            <li class="flex items-center justify-between"><span class="flex items-center gap-2 text-ink-700"><span class="w-2 h-2 rounded-sm bg-rose-200"></span><span data-i18n="rTimingShort">التوقيت</span></span><span class="font-medium text-ink-900 num">11%</span></li>
+            <li class="flex items-center justify-between"><span class="flex items-center gap-2 text-ink-700"><span class="w-2 h-2 rounded-sm bg-ink-200"></span><span data-i18n="rOther">أخرى</span></span><span class="font-medium text-ink-900 num">6%</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+// ============ TRANSLATIONS ============
+const T = {
+  ar: {
+    brand:'لومن', brandSub:'نظام إدارة المبيعات', workspace:'مساحة عمل المبيعات',
+    navWorkspace:'مساحة العمل', account:'الحساب',
+    dashboard:'لوحة التحكم', leads:'الفرص', followups:'المتابعات', clients:'العملاء', reports:'التقارير', settings:'الإعدادات',
+    userName:'سارة أحمد', userRole:'مدير المبيعات', userFirstName:'سارة',
+    langSwitchTo:'English', langCode:'EN',
+    search:'ابحث في الفرص والعملاء…', newLead:'فرصة جديدة',
+    greeting:'صباح الخير', dashSub:'إليك ما يجري في خط مبيعاتك اليوم.',
+    kpiLeadsToday:'الفرص اليوم', kpiFollowupsToday:'متابعات اليوم', kpiConverted:'الفرص المحولة', kpiRejected:'الفرص المرفوضة',
+    overdue:'متأخرة', done:'منجزة', totalValue:'القيمة الإجمالية', topReason:'السبب الأبرز', reasonPrice:'السعر',
+    conversionRate:'معدل التحويل', conversionSub:'الفرص المحولة خلال آخر 12 أسبوعاً', thisPeriod:'هذه الفترة', prevPeriod:'الفترة السابقة',
+    rejectionReasons:'أسباب الرفض', rejectionSub:'لماذا لم تُغلق الصفقات',
+    rPrice:'السعر مرتفع', rNoBudget:'لا توجد ميزانية', rCompetitor:'اختار منافساً', rTiming:'توقيت غير مناسب', rOther:'أخرى',
+    recentActivity:'النشاط الأخير', viewAll:'عرض الكل',
+    movedToConverted:'تم نقلها إلى محولة', by:'بواسطة', ago12m:'منذ 12 د', ago1h:'منذ ساعة',
+    followupScheduledWith:'تمت جدولة متابعة مع', tomorrow10:'غداً، 10:00 صباحاً', called:'تم الاتصال بـ', min:'د',
+    pipeline:'خط المبيعات', leadCount:'فرصة',
+    sNew:'جديدة', sFollowup:'متابعة', sFollowupShort:'متابعة', sInterested:'مهتمة', sConverted:'محولة', sRejected:'مرفوضة', sHot:'ساخنة', sWon:'رابحة', sLost:'خاسرة',
+    leadsInPipeline:'فرصة في خط المبيعات', closedThisMonth:'مغلقة هذا الشهر',
+    export:'تصدير', kanban:'كانبان', table:'جدول', filter:'تصفية', sortLastContact:'ترتيب: آخر اتصال', agentAll:'الموظف: الكل',
+    cityRiyadh:'الرياض', cityJeddah:'جدة', employees:'موظفين', hospitality:'ضيافة', retail:'تجزئة', cafes:'مقاهي', branches:'فروع',
+    last:'آخر', today:'اليوم', tomorrow:'غداً', closed:'مغلقة', reason:'السبب',
+    d1ago:'منذ يوم', d2ago:'منذ يومين', d3ago:'منذ 3 أيام', d5ago:'منذ 5 أيام', h5ago:'منذ 5 س',
+    overdue1d:'متأخر بـ يوم', in2h:'خلال ساعتين', in1d:'خلال يوم',
+    todayDate:'اليوم، 29 أبريل', youHave:'لديك', leadsToFollow:'فرص للمتابعة', todaySimple:'اليوم',
+    stayOnRhythm:'حافظ على إيقاعك.', handleFirst:'تعامل معها أولاً للحفاظ على دفء الصفقات.',
+    startWithOverdue:'ابدأ بالمتأخرة', viewCalendar:'عرض التقويم',
+    overdueTab:'المتأخرة', todayTab:'اليوم', tomorrowTab:'غداً', weekTab:'هذا الأسبوع',
+    pricingPresentation:'عرض الأسعار', scheduled:'مجدولة', callBtn:'اتصال', reschedule:'إعادة جدولة',
+    completedAt:'اكتملت في', done2:'تمت',
+    active:'نشط', atRisk:'في خطر', churnedThisQ:'منسحبون هذا الربع',
+    thClient:'العميل', thStatus:'الحالة', thPlan:'الباقة', thMRR:'الإيراد الشهري', thOwner:'المالك', thSince:'منذ',
+    planGrowth:'نمو', planEnt:'مؤسسات',
+    performanceOverview:'نظرة عامة على الأداء', last30:'آخر 30 يوماً',
+    salesFunnel:'قمع المبيعات', funnelSub:'من فرصة جديدة إلى صفقة مغلقة',
+    newLeadsLabel:'فرص جديدة', contactedLabel:'تم التواصل',
+    lostDeals:'صفقات خاسرة', topReasonShort:'السبب الأبرز',
+    rNoBudgetShort:'لا ميزانية', rCompShort:'منافس', rTimingShort:'التوقيت',
+  },
+  en: {
+    brand:'Lumen', brandSub:'Sales CRM', workspace:'Sales workspace',
+    navWorkspace:'Workspace', account:'Account',
+    dashboard:'Dashboard', leads:'Leads', followups:'Follow-ups', clients:'Clients', reports:'Reports', settings:'Settings',
+    userName:'Sara Ahmed', userRole:'Sales Manager', userFirstName:'Sara',
+    langSwitchTo:'العربية', langCode:'AR',
+    search:'Search leads, clients, reports…', newLead:'New lead',
+    greeting:'Good morning', dashSub:"Here's what's happening across your pipeline today.",
+    kpiLeadsToday:'Leads today', kpiFollowupsToday:'Follow-ups today', kpiConverted:'Converted leads', kpiRejected:'Rejected leads',
+    overdue:'overdue', done:'done', totalValue:'total value', topReason:'Top reason', reasonPrice:'Price',
+    conversionRate:'Conversion rate', conversionSub:'Leads converted across the last 12 weeks', thisPeriod:'This period', prevPeriod:'Previous',
+    rejectionReasons:'Rejection reasons', rejectionSub:"Why deals didn't close",
+    rPrice:'Price too high', rNoBudget:'No budget', rCompetitor:'Chose competitor', rTiming:'Bad timing', rOther:'Other',
+    recentActivity:'Recent activity', viewAll:'View all',
+    movedToConverted:'moved to Converted', by:'by', ago12m:'12m ago', ago1h:'1h ago',
+    followupScheduledWith:'Follow-up scheduled with', tomorrow10:'tomorrow, 10:00 AM', called:'Called', min:'min',
+    pipeline:'Pipeline', leadCount:'leads',
+    sNew:'New', sFollowup:'Follow-up', sFollowupShort:'Follow', sInterested:'Interested', sConverted:'Converted', sRejected:'Rejected', sHot:'Hot', sWon:'Won', sLost:'Lost',
+    leadsInPipeline:'leads in pipeline', closedThisMonth:'closed this month',
+    export:'Export', kanban:'Kanban', table:'Table', filter:'Filter', sortLastContact:'Sort: Last contact', agentAll:'Agent: All',
+    cityRiyadh:'Riyadh', cityJeddah:'Jeddah', employees:'employees', hospitality:'Hospitality', retail:'Retail', cafes:'cafés', branches:'branches',
+    last:'Last', today:'Today', tomorrow:'Tomorrow', closed:'Closed', reason:'Reason',
+    d1ago:'1d ago', d2ago:'2d ago', d3ago:'3d ago', d5ago:'5d ago', h5ago:'5h ago',
+    overdue1d:'Overdue 1d', in2h:'In 2h', in1d:'In 1 day',
+    todayDate:'Today, 29 April', youHave:'You have', leadsToFollow:'leads to follow', todaySimple:'today',
+    stayOnRhythm:'Stay on rhythm.', handleFirst:'Handle those first to keep deals warm.',
+    startWithOverdue:'Start with overdue', viewCalendar:'View calendar',
+    overdueTab:'Overdue', todayTab:'Today', tomorrowTab:'Tomorrow', weekTab:'This week',
+    pricingPresentation:'Pricing presentation', scheduled:'scheduled', callBtn:'Call', reschedule:'Reschedule',
+    completedAt:'Completed at', done2:'Done',
+    active:'Active', atRisk:'At risk', churnedThisQ:'churned this quarter',
+    thClient:'Client', thStatus:'Status', thPlan:'Plan', thMRR:'MRR', thOwner:'Owner', thSince:'Since',
+    planGrowth:'Growth', planEnt:'Enterprise',
+    performanceOverview:'Performance overview', last30:'Last 30 days',
+    salesFunnel:'Sales funnel', funnelSub:'From new lead to closed deal',
+    newLeadsLabel:'New leads', contactedLabel:'Contacted',
+    lostDeals:'lost deals', topReasonShort:'top reason',
+    rNoBudgetShort:'No budget', rCompShort:'Competitor', rTimingShort:'Timing',
+  }
+};
+
+let currentLang = 'ar';
+
+function applyLang(lang) {
+  const root = document.getElementById('root');
+  root.setAttribute('lang', lang);
+  root.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (T[lang][key]) el.textContent = T[lang][key];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const key = el.dataset.i18nPh;
+    if (T[lang][key]) el.placeholder = T[lang][key];
+  });
+  document.title = lang === 'ar' ? 'Lumen CRM — معاينة' : 'Lumen CRM — Preview';
+  // update greeting
+  const hour = new Date().getHours();
+  const greetEl = document.querySelector('[data-i18n="greeting"]');
+  if (greetEl) {
+    greetEl.textContent = lang === 'ar'
+      ? (hour < 12 ? 'صباح الخير' : 'مساء الخير')
+      : (hour < 12 ? 'Good morning' : (hour < 18 ? 'Good afternoon' : 'Good evening'));
+  }
+  // update crumb based on active page
+  const activePage = document.querySelector('.nav-link.active')?.dataset.page;
+  if (activePage) {
+    document.getElementById('crumb').textContent = T[lang][activePage] || activePage;
+  }
+  currentLang = lang;
+}
+
+function toggleLanguage() {
+  applyLang(currentLang === 'ar' ? 'en' : 'ar');
+}
+
+// initial
+applyLang('ar');
+
+// language toggle button
+const langBtn = document.getElementById('lang-toggle');
+if (langBtn) {
+  langBtn.addEventListener('click', e => {
+    e.preventDefault();
+    applyLang(currentLang === 'ar' ? 'en' : 'ar');
+  });
+}
+
+// page nav
+const links = document.querySelectorAll('.nav-link[data-page]');
+const pages = document.querySelectorAll('.page');
+links.forEach(l => {
+  l.addEventListener('click', e => {
+    e.preventDefault();
+    const target = l.dataset.page;
+    links.forEach(x => x.classList.remove('active'));
+    l.classList.add('active');
+    pages.forEach(p => p.classList.remove('active'));
+    const pageEl = document.getElementById('page-' + target);
+    if (pageEl) pageEl.classList.add('active');
+    const crumb = document.getElementById('crumb');
+    if (crumb) crumb.textContent = T[currentLang][target] || target;
+    window.scrollTo(0,0);
+  });
+});
+
+// generic tab groups (date range pills, kanban/table toggle, follow-up tabs)
+document.querySelectorAll('[data-tab-group]').forEach(group => {
+  const buttons = group.querySelectorAll('button');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => {
+        b.classList.remove('bg-ink-900','text-white','bg-white','shadow-soft','text-ink-900','border-ink-900');
+        b.classList.add('text-ink-500');
+      });
+      btn.classList.remove('text-ink-500');
+      const variant = group.dataset.tabGroup;
+      if (variant === 'pill-dark') {
+        btn.classList.add('bg-ink-900','text-white');
+      } else if (variant === 'pill-light') {
+        btn.classList.add('bg-white','shadow-soft','text-ink-900');
+      } else {
+        btn.classList.add('text-ink-900');
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>
