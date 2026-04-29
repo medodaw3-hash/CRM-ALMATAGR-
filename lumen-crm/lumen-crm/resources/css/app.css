@@ -1,0 +1,166 @@
+/* resources/css/app.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   Base typography & smoothing
+   ============================================ */
+@layer base {
+    html {
+        font-family: 'Inter', 'IBM Plex Sans Arabic', ui-sans-serif, system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    body {
+        text-rendering: optimizeLegibility;
+    }
+
+    /* When dir="rtl" on <html>, prefer Arabic font for body text */
+    [dir="rtl"] body,
+    [dir="rtl"] {
+        font-family: 'IBM Plex Sans Arabic', 'Inter', ui-sans-serif, system-ui, sans-serif;
+        /* Slightly larger for Arabic to match Latin's visual weight */
+        font-size: 0.95rem;
+    }
+
+    /* Latin numerals & code inside RTL stay LTR & monospaced */
+    [dir="rtl"] .font-mono,
+    [dir="rtl"] code,
+    [dir="rtl"] kbd,
+    [dir="rtl"] [data-numeric] {
+        direction: ltr;
+        unicode-bidi: embed;
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+    }
+}
+
+/* ============================================
+   Chevrons & directional icons — auto-flip in RTL
+   ============================================ */
+[dir="rtl"] [data-flip-rtl],
+[dir="rtl"] .rtl-flip {
+    transform: scaleX(-1);
+}
+
+/* ============================================
+   Scrollbars (subtle)
+   ============================================ */
+@layer utilities {
+    .scrollbar-thin::-webkit-scrollbar       { width: 6px; height: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(0,0,0,.12); border-radius: 999px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+}
+
+/* ============================================
+   Lead-card hover lift
+   ============================================ */
+.lead-card {
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.lead-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(16,24,40,0.08);
+}
+.lead-card[draggable="true"]:active { cursor: grabbing; }
+
+/* ============================================
+   Kanban dropzone hover state
+   ============================================ */
+[data-kanban-dropzone].drag-over {
+    box-shadow: 0 0 0 2px theme('colors.brand.400');
+}
+
+/* ============================================
+   Pulse for active client status
+   ============================================ */
+@keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: .55; }
+}
+.animate-pulse-soft {
+    animation: pulse-soft 1.8s ease-in-out infinite;
+}
+
+/* ============================================
+   Form base styles (works with @tailwindcss/forms)
+   ============================================ */
+@layer components {
+    input[type="text"],
+    input[type="email"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="datetime-local"],
+    input[type="date"],
+    select,
+    textarea {
+        @apply rounded-lg border-ink-200 text-sm placeholder-ink-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20;
+    }
+}
+
+/* ============================================
+   RTL-specific fixes
+   ============================================ */
+
+/* Sidebar border: in LTR border is on the right, in RTL on the left */
+[dir="rtl"] aside.start-0 {
+    border-left: 1px solid rgba(255,255,255,0.05);
+    border-right: none;
+}
+
+/* Timeline border-l on the start side */
+[dir="rtl"] .timeline-rail {
+    border-left: 0;
+    border-right: 2px solid theme('colors.ink.100');
+    margin-left: 0;
+    margin-right: 0.75rem;
+}
+[dir="rtl"] .timeline-dot {
+    left: auto;
+    right: -11px;
+}
+
+/* SVG line/area charts shouldn't flip — keep them LTR even in RTL pages */
+[dir="rtl"] .chart-ltr,
+[dir="rtl"] svg[data-chart] {
+    direction: ltr;
+}
+
+/* Kanban: in RTL, columns visually flow right-to-left but our flex container
+   doesn't need flex-direction: row-reverse if we use logical scroll behavior.
+   Force a sensible scroll alignment: */
+[dir="rtl"] #kanban-board {
+    direction: rtl;
+}
+[dir="rtl"] #kanban-board > .kanban-row {
+    direction: rtl;
+}
+
+/* Border-l accent on cards: switch to border-r in RTL */
+[dir="rtl"] .border-l-2 {
+    border-left-width: 0;
+    border-right-width: 2px;
+}
+[dir="rtl"] .border-l-rose-500 {
+    border-left-color: transparent;
+    border-right-color: theme('colors.rose.500');
+}
+[dir="rtl"] .border-l-amber-500 {
+    border-left-color: transparent;
+    border-right-color: theme('colors.amber.500');
+}
+
+/* Tab indicator (border-b-2 stays the same in RTL — bottom borders don't flip) */
+
+/* Translation classes for slide-in animations should respect direction */
+[dir="rtl"] .-translate-x-full { transform: translateX(100%); }
+
+/* Phone numbers and emails should stay LTR */
+[dir="rtl"] .force-ltr,
+[dir="rtl"] [data-ltr],
+[dir="rtl"] a[href^="tel:"],
+[dir="rtl"] a[href^="mailto:"] {
+    direction: ltr;
+    display: inline-block;
+    unicode-bidi: embed;
+}
