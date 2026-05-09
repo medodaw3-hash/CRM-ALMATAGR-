@@ -101,25 +101,25 @@
     <nav class="flex-1 px-3 mt-4 space-y-0.5 overflow-y-auto scrollbar-thin">
       <div class="px-2 pb-1.5 text-[11px] uppercase tracking-wider text-ink-500 font-medium" data-i18n="navWorkspace">مساحة العمل</div>
 
-      <a href="#" data-page="dashboard" class="nav-link active flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-white/5">
+      <a href="#/dashboard" data-page="dashboard" class="nav-link active flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-white/5">
         <svg class="nav-icon text-ink-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
         <span class="flex-1 truncate" data-i18n="dashboard">لوحة التحكم</span>
       </a>
-      <a href="#" data-page="leads" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-white/5">
+      <a href="#/leads" data-page="leads" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-white/5">
         <svg class="nav-icon text-ink-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
         <span class="flex-1 truncate" data-i18n="leads">الفرص</span>
         <span class="text-[11px] font-medium text-ink-300 bg-white/5 px-1.5 py-0.5 rounded shrink-0 num">128</span>
       </a>
-      <a href="#" data-page="followups" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-white/5">
+      <a href="#/followups" data-page="followups" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-white/5">
         <svg class="nav-icon text-ink-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
         <span class="flex-1 truncate" data-i18n="followups">المتابعات</span>
         <span class="text-[11px] font-medium text-amber-300 bg-amber-500/15 px-1.5 py-0.5 rounded shrink-0 num">7</span>
       </a>
-      <a href="#" data-page="clients" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-white/5">
+      <a href="#/clients" data-page="clients" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-white/5">
         <svg class="nav-icon text-ink-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         <span data-i18n="clients">العملاء</span>
       </a>
-      <a href="#" data-page="reports" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-white/5">
+      <a href="#/reports" data-page="reports" class="nav-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm hover:bg-white/5">
         <svg class="nav-icon text-ink-400 shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
         <span data-i18n="reports">التقارير</span>
       </a>
@@ -186,10 +186,10 @@
           <p class="text-sm text-ink-500 mt-1" data-i18n="dashSub">إليك ما يجري في خط مبيعاتك اليوم.</p>
         </div>
         <div class="flex items-center gap-2">
-          <div class="flex items-center bg-white border border-ink-200 rounded-lg p-0.5 text-sm">
-            <button class="px-3 py-1.5 rounded-md text-ink-500 hover:text-ink-900 num">7d</button>
-            <button class="px-3 py-1.5 rounded-md bg-ink-900 text-white num">30d</button>
-            <button class="px-3 py-1.5 rounded-md text-ink-500 hover:text-ink-900 num">90d</button>
+          <div class="flex items-center bg-white border border-ink-200 rounded-lg p-0.5 text-sm" data-tab-group="pill-dark">
+            <button type="button" class="px-3 py-1.5 rounded-md text-ink-500 hover:text-ink-900 num">7d</button>
+            <button type="button" class="px-3 py-1.5 rounded-md bg-ink-900 text-white num">30d</button>
+            <button type="button" class="px-3 py-1.5 rounded-md text-ink-500 hover:text-ink-900 num">90d</button>
           </div>
         </div>
       </div>
@@ -425,12 +425,12 @@
 
       <!-- Filter / view bar -->
       <div class="bg-white rounded-xl border border-ink-100 shadow-soft p-2 flex items-center gap-2 mb-5 flex-wrap">
-        <div class="flex items-center bg-ink-50 rounded-lg p-0.5">
-          <button class="px-3 h-8 rounded-md text-sm font-medium bg-white shadow-soft text-ink-900 flex items-center gap-1.5">
+        <div class="flex items-center bg-ink-50 rounded-lg p-0.5" data-tab-group="pill-light">
+          <button type="button" class="px-3 h-8 rounded-md text-sm font-medium bg-white shadow-soft text-ink-900 flex items-center gap-1.5">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="11" rx="1"/></svg>
             <span data-i18n="kanban">كانبان</span>
           </button>
-          <button class="px-3 h-8 rounded-md text-sm font-medium text-ink-500 hover:text-ink-900 flex items-center gap-1.5">
+          <button type="button" class="px-3 h-8 rounded-md text-sm font-medium text-ink-500 hover:text-ink-900 flex items-center gap-1.5">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
             <span data-i18n="table">جدول</span>
           </button>
@@ -647,11 +647,11 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-1 mb-4 border-b border-ink-100 overflow-x-auto">
-        <button class="px-4 py-2.5 text-sm font-medium text-ink-900 border-b-2 border-ink-900 -mb-px flex items-center gap-2 whitespace-nowrap"><span data-i18n="overdueTab">المتأخرة</span> <span class="text-[11px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-semibold num">3</span></button>
-        <button class="px-4 py-2.5 text-sm font-medium text-ink-500 hover:text-ink-900 flex items-center gap-2 whitespace-nowrap"><span data-i18n="todayTab">اليوم</span> <span class="text-[11px] px-1.5 py-0.5 rounded bg-ink-100 text-ink-600 font-semibold num">4</span></button>
-        <button class="px-4 py-2.5 text-sm font-medium text-ink-500 hover:text-ink-900 flex items-center gap-2 whitespace-nowrap"><span data-i18n="tomorrowTab">غداً</span> <span class="text-[11px] px-1.5 py-0.5 rounded bg-ink-100 text-ink-600 font-semibold num">5</span></button>
-        <button class="px-4 py-2.5 text-sm font-medium text-ink-500 hover:text-ink-900 flex items-center gap-2 whitespace-nowrap"><span data-i18n="weekTab">هذا الأسبوع</span> <span class="text-[11px] px-1.5 py-0.5 rounded bg-ink-100 text-ink-600 font-semibold num">14</span></button>
+      <div class="flex items-center gap-1 mb-4 border-b border-ink-100 overflow-x-auto" data-tab-group="underline-tabs">
+        <button type="button" class="px-4 py-2.5 text-sm font-medium text-ink-900 border-b-2 border-ink-900 -mb-px flex items-center gap-2 whitespace-nowrap"><span data-i18n="overdueTab">المتأخرة</span> <span class="text-[11px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-semibold num">3</span></button>
+        <button type="button" class="px-4 py-2.5 text-sm font-medium text-ink-500 hover:text-ink-900 flex items-center gap-2 whitespace-nowrap"><span data-i18n="todayTab">اليوم</span> <span class="text-[11px] px-1.5 py-0.5 rounded bg-ink-100 text-ink-600 font-semibold num">4</span></button>
+        <button type="button" class="px-4 py-2.5 text-sm font-medium text-ink-500 hover:text-ink-900 flex items-center gap-2 whitespace-nowrap"><span data-i18n="tomorrowTab">غداً</span> <span class="text-[11px] px-1.5 py-0.5 rounded bg-ink-100 text-ink-600 font-semibold num">5</span></button>
+        <button type="button" class="px-4 py-2.5 text-sm font-medium text-ink-500 hover:text-ink-900 flex items-center gap-2 whitespace-nowrap"><span data-i18n="weekTab">هذا الأسبوع</span> <span class="text-[11px] px-1.5 py-0.5 rounded bg-ink-100 text-ink-600 font-semibold num">14</span></button>
       </div>
 
       <div class="bg-white rounded-xl border border-ink-100 shadow-soft divide-y divide-ink-100">
@@ -797,6 +797,11 @@
   </main>
 </div>
 
+<div id="demo-toast" hidden class="fixed bottom-6 start-1/2 -translate-x-1/2 z-[200] max-w-md w-[min(100%-2rem,28rem)] rounded-xl border border-ink-200 bg-white shadow-pop p-4 text-sm" role="status">
+  <div class="font-semibold text-ink-900" id="demo-toast-title"></div>
+  <div class="text-ink-600 mt-1 text-[13px] leading-snug" id="demo-toast-body"></div>
+</div>
+
 <script>
 // ============ TRANSLATIONS ============
 const T = {
@@ -838,6 +843,8 @@ const T = {
     newLeadsLabel:'فرص جديدة', contactedLabel:'تم التواصل',
     lostDeals:'صفقات خاسرة', topReasonShort:'السبب الأبرز',
     rNoBudgetShort:'لا ميزانية', rCompShort:'منافس', rTimingShort:'التوقيت',
+    demoToastTitle:'معاينة فقط',
+    demoToastBody:'GitHub Pages يعرض واجهة HTML ثابتة. الأزرار والنماذج الكاملة تعمل مع خادم Laravel (مجلد lumen-crm في المستودع).',
   },
   en: {
     brand:'Lumen', brandSub:'Sales CRM', workspace:'Sales workspace',
@@ -877,6 +884,8 @@ const T = {
     newLeadsLabel:'New leads', contactedLabel:'Contacted',
     lostDeals:'lost deals', topReasonShort:'top reason',
     rNoBudgetShort:'No budget', rCompShort:'Competitor', rTimingShort:'Timing',
+    demoToastTitle:'Static preview',
+    demoToastBody:'GitHub Pages only serves static HTML. Full button actions need the Laravel app (see lumen-crm in the repo) running on PHP hosting or locally.',
   }
 };
 
@@ -915,10 +924,94 @@ function toggleLanguage() {
   applyLang(currentLang === 'ar' ? 'en' : 'ar');
 }
 
-// initial
+let demoToastTimer;
+function showDemoToast() {
+  const box = document.getElementById('demo-toast');
+  const tEl = document.getElementById('demo-toast-title');
+  const bEl = document.getElementById('demo-toast-body');
+  if (!box || !tEl || !bEl) return;
+  tEl.textContent = T[currentLang].demoToastTitle || '';
+  bEl.textContent = T[currentLang].demoToastBody || '';
+  box.removeAttribute('hidden');
+  clearTimeout(demoToastTimer);
+  demoToastTimer = setTimeout(() => box.setAttribute('hidden', ''), 3200);
+}
+
+const VALID_PAGES = new Set(['dashboard', 'leads', 'followups', 'clients', 'reports']);
+
+function navigateToPage(target) {
+  if (!VALID_PAGES.has(target)) return;
+  const links = document.querySelectorAll('.nav-link[data-page]');
+  const pages = document.querySelectorAll('.page');
+  links.forEach(x => x.classList.toggle('active', x.dataset.page === target));
+  pages.forEach(p => p.classList.toggle('active', p.id === 'page-' + target));
+  const crumb = document.getElementById('crumb');
+  if (crumb) crumb.textContent = T[currentLang][target] || target;
+  window.scrollTo(0, 0);
+  const h = '#/' + target;
+  if (location.hash !== h) history.pushState(null, '', h);
+}
+
+function syncFromHash() {
+  const m = /^#\/(dashboard|leads|followups|clients|reports)$/.exec(location.hash);
+  if (m) navigateToPage(m[1]);
+}
+
+function wireTabGroups() {
+  document.querySelectorAll('[data-tab-group]').forEach(group => {
+    const buttons = group.querySelectorAll('button');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => {
+          b.classList.remove('bg-ink-900','text-white','bg-white','shadow-soft','text-ink-900','border-ink-900','border-b-2','-mb-px');
+          b.classList.add('text-ink-500');
+        });
+        btn.classList.remove('text-ink-500');
+        const variant = group.dataset.tabGroup;
+        if (variant === 'pill-dark') {
+          btn.classList.add('bg-ink-900','text-white');
+        } else if (variant === 'pill-light') {
+          btn.classList.add('bg-white','shadow-soft','text-ink-900');
+        } else if (variant === 'underline-tabs') {
+          btn.classList.add('text-ink-900','border-b-2','border-ink-900','-mb-px');
+        } else {
+          btn.classList.add('text-ink-900');
+        }
+      });
+    });
+  });
+}
+
+function wireDemoClicks() {
+  document.body.addEventListener('click', e => {
+    const navLink = e.target.closest('a.nav-link[data-page]');
+    if (navLink) {
+      e.preventDefault();
+      navigateToPage(navLink.dataset.page);
+      return;
+    }
+    if (e.target.closest('[data-tab-group]')) return;
+    if (e.target.closest('#lang-toggle')) return;
+    const junkA = e.target.closest('a[href^="#"]');
+    if (junkA && !junkA.hasAttribute('data-page')) {
+      e.preventDefault();
+      showDemoToast();
+      return;
+    }
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    showDemoToast();
+  });
+}
+
+function boot() {
+  syncFromHash();
+  wireTabGroups();
+  wireDemoClicks();
+}
+
 applyLang('ar');
 
-// language toggle button
 const langBtn = document.getElementById('lang-toggle');
 if (langBtn) {
   langBtn.addEventListener('click', e => {
@@ -927,45 +1020,12 @@ if (langBtn) {
   });
 }
 
-// page nav
-const links = document.querySelectorAll('.nav-link[data-page]');
-const pages = document.querySelectorAll('.page');
-links.forEach(l => {
-  l.addEventListener('click', e => {
-    e.preventDefault();
-    const target = l.dataset.page;
-    links.forEach(x => x.classList.remove('active'));
-    l.classList.add('active');
-    pages.forEach(p => p.classList.remove('active'));
-    const pageEl = document.getElementById('page-' + target);
-    if (pageEl) pageEl.classList.add('active');
-    const crumb = document.getElementById('crumb');
-    if (crumb) crumb.textContent = T[currentLang][target] || target;
-    window.scrollTo(0,0);
-  });
-});
-
-// generic tab groups (date range pills, kanban/table toggle, follow-up tabs)
-document.querySelectorAll('[data-tab-group]').forEach(group => {
-  const buttons = group.querySelectorAll('button');
-  buttons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      buttons.forEach(b => {
-        b.classList.remove('bg-ink-900','text-white','bg-white','shadow-soft','text-ink-900','border-ink-900');
-        b.classList.add('text-ink-500');
-      });
-      btn.classList.remove('text-ink-500');
-      const variant = group.dataset.tabGroup;
-      if (variant === 'pill-dark') {
-        btn.classList.add('bg-ink-900','text-white');
-      } else if (variant === 'pill-light') {
-        btn.classList.add('bg-white','shadow-soft','text-ink-900');
-      } else {
-        btn.classList.add('text-ink-900');
-      }
-    });
-  });
-});
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
+window.addEventListener('hashchange', syncFromHash);
 </script>
 </body>
 </html>
